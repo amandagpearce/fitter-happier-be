@@ -1,8 +1,8 @@
 import uuid
-from flask import request
 from flask_smorest import abort, Blueprint
 from flask.views import MethodView
 from db import stores
+from schemas import StoreSchema
 
 blp = Blueprint("Store", __name__, description="Operações em stores")
 
@@ -31,14 +31,8 @@ class StoreList(MethodView):
         else:
             abort(404, message="No stores found")
 
-    def post(self):
-        store_data = request.get_json()
-
-        if "name" not in store_data:
-            abort(
-                400,
-                message="Bad request. Campo 'name' precisa existir no payload",
-            )
+    @blp.arguments(StoreSchema)
+    def post(self, store_data):
 
         for store in stores.values():
             if store_data["name"] == store["name"]:
