@@ -3,9 +3,9 @@ FROM python:3.11
 # exposing the port where the app will run
 EXPOSE 5000
 COPY requirements.txt .
-# install flask
+# install requirements
 RUN pip install -r requirements.txt
 # copy everything (first .) to the directory we are at (second .)
 COPY . .
 # say what commands will run the container
-CMD ["flask", "run", "--host", "0.0.0.0", "--reload"]
+CMD ["flask", "run", "--host", "0.0.0.0"]
