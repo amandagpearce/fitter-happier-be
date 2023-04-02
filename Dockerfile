@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 # copy everything (first .) to the directory we are at (second .)
 COPY . .
 # say what commands will run the container
-CMD ["flask", "run", "--host", "0.0.0.0"]
+CMD ["flask", "run", "--host", "0.0.0.0", "--reload"]
