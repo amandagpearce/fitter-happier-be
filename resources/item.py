@@ -9,6 +9,7 @@ blp = Blueprint("Items", __name__, description="Operações em items")
 
 @blp.route("/item/<string:item_id>")
 class Item(MethodView):
+    @blp.response(200, ItemSchema)
     def get(self, item_id):
         try:
             return items[item_id], 200
@@ -25,6 +26,7 @@ class Item(MethodView):
     @blp.arguments(
         ItemUpdateSchema
     )  # the item_data from the validation needs to come before the root args
+    @blp.response(200, ItemSchema)
     def put(self, item_data, item_id):
         try:
             item = items[item_id]
@@ -40,13 +42,12 @@ class Item(MethodView):
 
 @blp.route("/item")
 class ItemList(MethodView):
+    @blp.response(200, ItemSchema(many=True))
     def get(self):
-        if items.values():
-            return {"items": list(items.values())}
-        else:
-            abort(404, message="No items found")
+        return items.values()
 
     @blp.arguments(ItemSchema)
+    @blp.response(201, ItemSchema)
     def post(
         self, item_data
     ):  # item_data contains the validated fields from marshmallow
@@ -67,4 +68,4 @@ class ItemList(MethodView):
         new_item = {**item_data, "id": item_id}
         items[item_id] = new_item
 
-        return new_item, 201
+        return new_item
