@@ -25,8 +25,8 @@ class PlainStoreSchema(Schema):
 
 
 class ItemSchema(PlainItemSchema):
-    store_id = (
-        fields.Int(required=True, load_only=True),
+    store_id = fields.Int(
+        required=True, load_only=True
     )  # whenever we receive data from client we'll pass the store_id
     store = fields.Nested(PlainStoreSchema(), dump_only=True)
 

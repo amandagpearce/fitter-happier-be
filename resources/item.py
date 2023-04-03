@@ -1,9 +1,10 @@
-import uuid
 from flask_smorest import abort, Blueprint
 from flask.views import MethodView
 
-# from db import items, stores
+from db import db
+from sqlalchemy.exc import SQLAlchemyError
 from schemas import ItemSchema, ItemUpdateSchema
+from models import ItemModel
 
 blp = Blueprint("Items", __name__, description="Operações em items")
 
@@ -53,20 +54,14 @@ class ItemList(MethodView):
         self, item_data
     ):  # item_data contains the validated fields from marshmallow
 
-        # checando se o item já não existe p/ prevenir items duplicados
-        for item in items.values():
-            if (
-                item_data["name"] == item["name"]
-                and item_data["store_id"] == item["store_id"]
-            ):
-                abort(400, message="Item já existe")
+        item = ItemModel(
+            **item_data
+        )  # **item_data turns the dictionary received into keyword args
 
-        # checando se a store existe
-        if item_data["store_id"] not in stores:
-            abort(404, message="Store not found")
+        try:
+            db.session.add(item)  # you can do multiple adds before "commit"
+            db.session.commit()  # actually saving; can run commit once for multiple adds
+        except SQLAlchemyError:
+            abort(500, message="Erro ao inserir item no banco")
 
-        item_id = uuid.uuid4().hex
-        new_item = {**item_data, "id": item_id}
-        items[item_id] = new_item
-
-        return new_item
+        return item
