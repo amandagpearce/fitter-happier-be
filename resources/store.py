@@ -1,4 +1,3 @@
-import uuid
 from flask_smorest import abort, Blueprint
 from flask.views import MethodView
 
@@ -20,7 +19,9 @@ class Store(MethodView):
 
     def delete(self, store_id):
         store = StoreModel.query.get_or_404(store_id)
-        raise NotImplementedError("Deletar ainda não existe")
+        db.session.delete(store)
+        db.session.commit()
+        return {"message": "Store foi deletada"}
 
 
 @blp.route("/store")

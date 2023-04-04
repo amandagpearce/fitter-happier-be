@@ -10,6 +10,7 @@ class StoreModel(db.Model):
         "ItemModel",
         back_populates="store",
         lazy="dynamic",  # the items here wont be fecthed unless we tell it to
+        cascade="all, delete",
     )
 
 
