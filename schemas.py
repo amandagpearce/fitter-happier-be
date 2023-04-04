@@ -17,6 +17,7 @@ class PlainItemSchema(
 class ItemUpdateSchema(Schema):
     name = fields.Str()  # not name or price are required but can be received
     price = fields.Float()
+    store_id = fields.Int()  # not required but could exist in a put request
 
 
 class PlainStoreSchema(Schema):
