@@ -2,6 +2,7 @@ import os
 from flask_cors import CORS
 from flask import Flask
 from flask_smorest import Api
+from flask_migrate import Migrate
 
 from resources.item import blp as ItemBlueprint
 from resources.store import blp as StoreBlueprint
@@ -30,7 +31,7 @@ def create_app(db_url=None):  # factory pattern
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)  # initializes sqlalchemy
-
+    migrate = Migrate(app, db)
     api = Api(app)
 
     with app.app_context():
