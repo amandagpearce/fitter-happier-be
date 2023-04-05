@@ -31,7 +31,7 @@ def create_app(db_url=None):  # factory pattern
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)  # initializes sqlalchemy
-    migrate = Migrate(app, db)
+    migrate = Migrate(app, db)  # noqa
     api = Api(app)
 
     with app.app_context():
