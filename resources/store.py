@@ -1,11 +1,11 @@
 from flask_smorest import abort, Blueprint
 from flask.views import MethodView
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from db import db
-
 from schemas import StoreSchema
 from models import StoreModel
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+
 
 blp = Blueprint("Store", __name__, description="Operações em stores")
 
@@ -14,7 +14,7 @@ blp = Blueprint("Store", __name__, description="Operações em stores")
 class Store(MethodView):
     @blp.response(200, StoreSchema)
     def get(self, store_id):
-        store = StoreModel.get_or_404(store_id)
+        store = StoreModel.query.get_or_404(store_id)
         return store
 
     def delete(self, store_id):

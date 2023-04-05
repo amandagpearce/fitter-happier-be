@@ -53,13 +53,10 @@ class ItemList(MethodView):
 
     @blp.arguments(ItemSchema)
     @blp.response(201, ItemSchema)
-    def post(
-        self, item_data
-    ):  # item_data contains the validated fields from marshmallow
+    def post(self, item_data):
 
-        item = ItemModel(
-            **item_data
-        )  # **item_data turns the dictionary received into keyword args
+        item = ItemModel(**item_data)
+        # **item_data turns the dictionary received into keyword args
 
         try:
             db.session.add(item)  # you can do multiple adds before "commit"

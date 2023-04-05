@@ -12,6 +12,7 @@ class StoreModel(db.Model):
         lazy="dynamic",  # the items here wont be fecthed unless we tell it to
         cascade="all, delete",
     )
+    tags = db.relationship("TagModel", back_populates="store", lazy="dynamic")
 
 
 # will go intto items table and retrieve items where the store_id matches

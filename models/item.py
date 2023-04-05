@@ -8,11 +8,15 @@ class ItemModel(db.Model):
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.Float(precision=2), unique=False, nullable=False)
     store_id = db.Column(
-        db.Integer, db.ForeignKey("stores.id"), unique=False, nullable=False
+        db.String, db.ForeignKey("stores.id"), unique=False, nullable=False
     )
     # will populate stores with the StoreModel object whose id matches the FK
     store = db.relationship("StoreModel", back_populates="items")
     # the Stores table is used by the StoreModel class
+
+    tags = db.relationship(
+        "TagModel", back_populates="items", secondary="item_tags"
+    )
 
 
 # when we have a store_id using the stores table we can define a relationship
@@ -20,3 +24,5 @@ class ItemModel(db.Model):
 # MEANING we can access later MyItem.store and have the store content
 
 # back_populates="items" - the store model will also receive items field
+
+# back_populates="items" on tags field, relating items to tags
