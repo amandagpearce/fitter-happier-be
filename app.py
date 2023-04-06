@@ -1,12 +1,15 @@
 import os
+from dotenv import load_dotenv
 from flask_cors import CORS
 from flask import Flask
 from flask_smorest import Api
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 
 from resources.item import blp as ItemBlueprint
 from resources.store import blp as StoreBlueprint
 from resources.tag import blp as TagBlueprint
+from resources.user import blp as UserBlueprint
 
 from db import db
 import models  # noqa
@@ -34,11 +37,16 @@ def create_app(db_url=None):  # factory pattern
     migrate = Migrate(app, db)  # noqa
     api = Api(app)
 
+    load_dotenv()
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+    jwt = JWTManager(app)  # noqa
+
     with app.app_context():
         db.create_all()  # creating the dbs if they dont already exist
 
     api.register_blueprint(ItemBlueprint)
     api.register_blueprint(StoreBlueprint)
     api.register_blueprint(TagBlueprint)
+    api.register_blueprint(UserBlueprint)
 
     return app

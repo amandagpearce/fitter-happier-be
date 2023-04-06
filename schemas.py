@@ -15,7 +15,7 @@ class PlainItemSchema(
 
 
 class PlainTagSchema(Schema):
-    id = fields.Str(dump_only=True)
+    id = fields.Int(dump_only=True)
     name = fields.Str()
 
 
@@ -26,12 +26,12 @@ class ItemUpdateSchema(Schema):
 
 
 class PlainStoreSchema(Schema):
-    id = fields.Str(dump_only=True)
+    id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
 
 
 class ItemSchema(PlainItemSchema):
-    store_id = fields.Str(
+    store_id = fields.Int(
         required=True, load_only=True
     )  # whenever we receive data from client we'll pass the store_id
     store = fields.Nested(PlainStoreSchema(), dump_only=True)
@@ -54,6 +54,14 @@ class TagAndItemSchema(Schema):
     message = fields.Str()
     item = fields.Nested(ItemSchema)
     tag = fields.Nested(TagSchema)
+
+
+class UserSchema(Schema):
+    id = fields.Int(dump_only=True)
+    username = fields.Str(required=True)
+    password = fields.Str(
+        required=True, load_only=True
+    )  # load_only=True ensures the pw will never be returned to the client
 
 
 # load_only -> receiving data from client
