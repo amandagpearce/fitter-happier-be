@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
-from flask import Flask
+from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
@@ -39,7 +39,37 @@ def create_app(db_url=None):  # factory pattern
 
     load_dotenv()
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-    jwt = JWTManager(app)  # noqa
+    jwt = JWTManager(app)
+
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        return jsonify(
+            {
+                "message": "Token expirado.",
+                "error": "invalid_token",
+            },
+            401,
+        )
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        return jsonify(
+            {
+                "message": "Assinatura de verificação falhou.",
+                "error": "invalid_token",
+            },
+            401,
+        )
+
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        return jsonify(
+            {
+                "description": "Request não contém token de acesso",
+                "error": "authorization_required",
+            },
+            401,
+        )
 
     with app.app_context():
         db.create_all()  # creating the dbs if they dont already exist
