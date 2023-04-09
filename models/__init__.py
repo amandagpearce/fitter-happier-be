@@ -3,3 +3,4 @@ from models.item import ItemModel  # noqa
 from models.tag import TagModel  # noqa
 from models.item_tags import ItemTags  # noqa
 from models.user import UserModel  # noqa
+from models.token_blocklist import TokenBlocklistModel  # noqa

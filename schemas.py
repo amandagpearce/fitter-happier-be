@@ -64,5 +64,9 @@ class UserSchema(Schema):
     )  # load_only=True ensures the pw will never be returned to the client
 
 
+class TokenBlocklist(Schema):
+    token = fields.Str(required=True, load_only=True)
+
+
 # load_only -> receiving data from client
 # dump_only -> sending data to client
