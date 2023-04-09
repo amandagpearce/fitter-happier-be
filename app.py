@@ -50,6 +50,18 @@ def create_app(db_url=None):  # factory pattern
 
         return tokenExists
 
+    @jwt.needs_fresh_token_loader
+    def token_not_fresh_callback(jwt_header, jwt_payload):
+        return (
+            jsonify(
+                {
+                    "description": "Token não é do tipo fresh.",
+                    "error": "fresh_token_required",
+                }
+            ),
+            401,
+        )
+
     @jwt.revoked_token_loader
     def revoked_token_callback(jwt_header, jwt_payload):
         return (
