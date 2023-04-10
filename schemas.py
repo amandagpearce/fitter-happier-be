@@ -4,14 +4,14 @@ from marshmallow import Schema, fields
 # plain schemas fix recursive nesting in schemas with relationships
 
 
-class PlainItemSchema(
+class PlainExerciseSchema(
     Schema
 ):  # an item schema that doesnt deal with stores at all
     id = fields.Int(
         dump_only=True
     )  # won't be used for validation, only used for returning data
     name = fields.Str(required=True)  # must be in the payload json
-    price = fields.Float(required=True)
+    type = fields.Str(required=True)
 
 
 class PlainTagSchema(Schema):
@@ -20,40 +20,41 @@ class PlainTagSchema(Schema):
 
 
 class ItemUpdateSchema(Schema):
-    name = fields.Str()  # not name or price are required but can be received
+    name = fields.Str()
     price = fields.Float()
-    store_id = fields.Int()  # not required but could exist in a put request
+    store_id = fields.Int()
 
 
-class PlainStoreSchema(Schema):
+class PlainVideoSchema(Schema):
     id = fields.Int(dump_only=True)
-    name = fields.Str(required=True)
+    yt_id = fields.Str(required=True)
+    title = fields.Str(required=True)
 
 
-class ItemSchema(PlainItemSchema):
-    store_id = fields.Int(
-        required=True, load_only=True
-    )  # whenever we receive data from client we'll pass the store_id
-    store = fields.Nested(PlainStoreSchema(), dump_only=True)
+class ExerciseSchema(PlainExerciseSchema):
+    user_id = fields.Int(required=True, load_only=True)
     tags = fields.List(fields.Nested(PlainTagSchema(), dump_only=True))
 
 
-class StoreSchema(PlainStoreSchema):
-    items = fields.List(fields.Nested(PlainItemSchema()), dump_only=True)
-    tags = fields.List(fields.Nested(PlainTagSchema()), dump_only=True)
+class VideoSchema(PlainVideoSchema):
+    exercises = fields.List(fields.Nested(PlainExerciseSchema()))
 
 
 class TagSchema(PlainTagSchema):
-    store_id = fields.Int(load_only=True)
-    items = fields.List(fields.Nested(PlainItemSchema()), dump_only=True)
-    store = fields.Nested(PlainStoreSchema(), dump_only=True)
-    items = fields.List(fields.Nested(PlainItemSchema()), dump_only=True)
+    user_id = fields.Int(load_only=True)
+    exercises = fields.List(
+        fields.Nested(PlainExerciseSchema()), dump_only=True
+    )
 
 
-class TagAndItemSchema(Schema):
-    message = fields.Str()
-    item = fields.Nested(ItemSchema)
+class TagAndExerciseSchema(Schema):
+    exercise = fields.Nested(ExerciseSchema)
     tag = fields.Nested(TagSchema)
+
+
+class VideoAndExerciseSchema(Schema):
+    exercise = fields.Nested(ExerciseSchema)
+    video = fields.Nested(VideoSchema)
 
 
 class UserSchema(Schema):

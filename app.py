@@ -6,8 +6,9 @@ from flask_smorest import Api
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 
-from resources.item import blp as ItemBlueprint
-from resources.store import blp as StoreBlueprint
+from resources.exercise import blp as ExerciseBlueprint
+
+from resources.video import blp as VideoBlueprint
 from resources.tag import blp as TagBlueprint
 from resources.user import blp as UserBlueprint
 
@@ -104,8 +105,8 @@ def create_app(db_url=None):  # factory pattern
     with app.app_context():
         db.create_all()  # creating the dbs if they dont already exist
 
-    api.register_blueprint(ItemBlueprint)
-    api.register_blueprint(StoreBlueprint)
+    api.register_blueprint(ExerciseBlueprint)
+    api.register_blueprint(VideoBlueprint)
     api.register_blueprint(TagBlueprint)
     api.register_blueprint(UserBlueprint)
 
