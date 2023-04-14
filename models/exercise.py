@@ -5,8 +5,8 @@ class ExercisesModel(db.Model):
     __tablename__ = "exercises"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    type = db.Column(db.String(1), nullable=False)
+    name = db.Column(db.String(80))
+    type = db.Column(db.String(1), nullable=False, unique=True)
     description = db.Column(db.String(80))
     user_id = db.Column(
         db.String, db.ForeignKey("users.id"), unique=False, nullable=False

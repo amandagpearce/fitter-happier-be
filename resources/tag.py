@@ -10,29 +10,24 @@ from models import TagModel, ExercisesModel
 blp = Blueprint("Tags", "tags", description="Operações com tags")
 
 
-@blp.route("/tag")
+@blp.route("/tag/<int:user_id>")
 class TagsInStore(MethodView):
-    # @blp.response(200, TagSchema(many=True))
-    # def get(self, exercise_id):
-    #     exercises = ExercisesModel.query.get_or_404(exercise_id)
+    @blp.response(200, TagSchema(many=True))
+    def get(self, user_id):
+        exercises = ExercisesModel.query.get_or_404(user_id)
 
-    #     return exercises.tags.all()  # lazy="dynamic" means 'tags' is a query
+        return exercises.tags  # lazy="dynamic" means 'tags' is a query
 
     @blp.arguments(TagSchema)
     @blp.response(201, TagSchema)
-    def post(
-        self, tag_data
-    ):  # creates tag - CHANGE SO IT'S ADDED TO EXERCISE AND NOT STORE
-        if TagModel.query.filter(
-            TagModel.user_id == tag_data["user_id"],
-            TagModel.name == tag_data["name"],
-        ).first():
+    def post(self, tag_data, user_id):  # creates tag
+        if TagModel.query.filter(TagModel.name == tag_data["name"]).first():
             abort(
                 400,
-                message="Tag com esse nome já existe nesse usuario.",
+                message="Tag com esse nome já existe.",
             )
 
-        tag = TagModel(**tag_data)
+        tag = TagModel(user_id=user_id, **tag_data)
 
         try:
             db.session.add(tag)
@@ -46,11 +41,13 @@ class TagsInStore(MethodView):
         return tag
 
 
-@blp.route("/exercise/<int:item_id>/tag/<int:tag_id>")  # links items + tags
+@blp.route(
+    "/exercise/<int:exercise_id>/tag/<int:tag_id>"
+)  # links exercises+tags
 class LinkTagsToItem(MethodView):
     @blp.response(201, TagSchema)
-    def post(self, item_id, tag_id):
-        item = ExercisesModel.query.get_or_404(item_id)
+    def post(self, exercise_id, tag_id):
+        item = ExercisesModel.query.get_or_404(exercise_id)
         tag = TagModel.query.get_or_404(tag_id)
 
         if item.user_id == tag.user_id:
@@ -69,21 +66,27 @@ class LinkTagsToItem(MethodView):
         return tag
 
     @blp.response(200, TagAndExerciseSchema)
-    def delete(self, item_id, tag_id):  # un-links items + tags
-        item = ExercisesModel.query.get_or_404(item_id)
+    def delete(self, exercise_id, tag_id):  # un-links items + tags
+        exercise = ExercisesModel.query.get_or_404(exercise_id)
         tag = TagModel.query.get_or_404(tag_id)
 
-        item.tags.remove(tag)  # working with the secondary table item_tags,
-        # sqlalchemy makes sure the item model will automatically do the
+        exercise.tags.remove(
+            tag
+        )  # working with the secondary table exercise_tags,
+        # sqlalchemy makes sure the exercise model will automatically do the
         # changes it needs
 
         try:
-            db.session.add(item)
+            db.session.add(exercise)
             db.session.commit()
         except SQLAlchemyError:
-            abort(500, message="Ocorreu um erro ao remover item da tag")
+            abort(500, message="Ocorreu um erro ao remover exercise da tag")
 
-        return {"message": "Item removido da tag", "item": item, "tag": tag}
+        return {
+            "message": "exercise removido da tag",
+            "exercise": exercise,
+            "tag": tag,
+        }
 
 
 @blp.route("/tag/<int:tag_id>")
@@ -111,7 +114,7 @@ class Tag(MethodView):
     def delete(self, tag_id):
         tag = TagModel.query.get_or_404(tag_id)
 
-        if not tag.items:  # if there are no items associated with the tag
+        if not tag.exercises:  # if there are no items associated with the tag
             db.session.delete(tag)
             db.session.commit()
             return {"message": "Tag deletada"}
@@ -120,5 +123,4 @@ class Tag(MethodView):
             message="""Não é possível deletar a tag. Certifique-se que não há
             nenhum item atrelado a ela""",
         )
-
         return tag

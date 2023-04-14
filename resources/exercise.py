@@ -5,8 +5,8 @@ from flask.views import MethodView
 
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
-from schemas import ExerciseSchema
-from models import ExercisesModel
+from schemas import ExerciseSchema, ExerciseUpdateSchema, ExerciseLogSchema
+from models import ExercisesModel, ExerciseLogs
 
 blp = Blueprint("Exercícios", __name__, description="Operações em exercícios")
 
@@ -28,26 +28,30 @@ class exercise(MethodView):
         db.session.commit()
         return {"message": "exercise deletado"}
 
-    # # @jwt_required()
-    # @blp.arguments(exerciseUpdateSchema)
-    # @blp.response(200, ExerciseSchema)
-    # def put(
-    #     self, exercise_data, exercise_id
-    # ):  # the exercise_data from the validation needs to come before the root args
-    #     exercise = ExercisesModel.query.get(exercise_id)
+    # @jwt_required()
+    @blp.arguments(ExerciseUpdateSchema)
+    @blp.response(200, ExerciseSchema)
+    def put(
+        self, exercise_data, exercise_id
+    ):  # the exercise_data from the validation
+        # needs to come before the root args
+        exercise = ExercisesModel.query.get(exercise_id)
 
-    #     if exercise:  # if exists, changes price and name
-    #         exercise.price = exercise_data["price"]
-    #         exercise.name = exercise_data["name"]
-    #     else:  # if doesnt exist, store id will be needed
-    #         exercise = ExercisesModel(
-    #             id=exercise_id, **exercise_data
-    #         )  # passing exercise_id from the url
+        if exercise:  # if exists, changes type and name
+            if exercise_data["name"]:
+                exercise.name = exercise_data["name"]
+            if exercise_data["type"]:
+                exercise.type = exercise_data["type"]
 
-    #     db.session.add(exercise)
-    #     db.session.commit()
+        else:  # if doesnt exist, store id will be needed
+            exercise = ExercisesModel(
+                id=exercise_id, **exercise_data
+            )  # passing exercise_id from the url
 
-    #     return exercise
+        db.session.add(exercise)
+        db.session.commit()
+
+        return exercise
 
 
 @blp.route("/exercise")
@@ -72,3 +76,22 @@ class exerciseList(MethodView):
             abort(500, message="Erro ao inserir exercise no banco")
 
         return exercise
+
+
+@blp.route("/exercise/log")
+class exerciseLog(MethodView):
+    # @jwt_required(fresh=True)
+    @blp.arguments(ExerciseLogSchema)
+    @blp.response(201, ExerciseLogSchema)
+    def post(self, log_data):
+        log = ExerciseLogs(**log_data)
+        # **exercise_data turns the dictionary received into keyword args
+
+        try:
+            db.session.add(log)
+            db.session.commit()  # actually saving
+            # can run commit once for multiple adds
+        except SQLAlchemyError:
+            abort(500, message="Erro ao inserir log no banco")
+
+        return log

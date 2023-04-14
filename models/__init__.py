@@ -5,3 +5,4 @@ from models.exercise_tags import ExerciseTags  # noqa
 from models.exercise_videos import ExerciseVideos  # noqa
 from models.user import UserModel  # noqa
 from models.token_blocklist import TokenBlocklistModel  # noqa
+from models.exercise_logs import ExerciseLogs  # noqa

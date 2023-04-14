@@ -11,17 +11,20 @@ blp = Blueprint("Video", __name__, description="Operações em videos")
 
 
 @blp.route("/video/<int:exercise_id>")
-class Store(MethodView):
+class GetVideoFromExercise(MethodView):
     @blp.response(200, VideoAndExerciseSchema)
     def get(self, exercise_id):
         videos = ExerciseVideos.query.all(exercise_id)
         return videos
 
-    # def delete(self, exercise_id):
-    #     video = ExerciseVideos.query.get_or_404(exercise_id)
-    #     db.session.delete(video)
-    #     db.session.commit()
-    #     return {"message": "Store foi deletada"}
+
+@blp.route("/video/<int:video_id>")
+class VideoDeletion(MethodView):
+    def delete(self, video_id):
+        video = VideoModel.query.get_or_404(video_id)
+        db.session.delete(video)
+        db.session.commit()
+        return {"message": "Video foi excluído"}
 
 
 @blp.route("/video")

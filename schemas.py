@@ -10,7 +10,7 @@ class PlainExerciseSchema(
     id = fields.Int(
         dump_only=True
     )  # won't be used for validation, only used for returning data
-    name = fields.Str(required=True)  # must be in the payload json
+    name = fields.Str(required=False)  # must be in the payload json
     type = fields.Str(required=True)
 
 
@@ -19,21 +19,21 @@ class PlainTagSchema(Schema):
     name = fields.Str()
 
 
-class ItemUpdateSchema(Schema):
-    name = fields.Str()
-    price = fields.Float()
-    store_id = fields.Int()
-
-
 class PlainVideoSchema(Schema):
     id = fields.Int(dump_only=True)
     yt_id = fields.Str(required=True)
     title = fields.Str(required=True)
 
 
+class ExerciseUpdateSchema(Schema):
+    name = fields.Str(required=False)
+    type = fields.Str(required=False)
+
+
 class ExerciseSchema(PlainExerciseSchema):
     user_id = fields.Int(required=True, load_only=True)
     tags = fields.List(fields.Nested(PlainTagSchema(), dump_only=True))
+    videos = fields.List(fields.Nested(PlainVideoSchema(), dump_only=True))
 
 
 class VideoSchema(PlainVideoSchema):
@@ -55,6 +55,12 @@ class TagAndExerciseSchema(Schema):
 class VideoAndExerciseSchema(Schema):
     exercise = fields.Nested(ExerciseSchema)
     video = fields.Nested(VideoSchema)
+
+
+class ExerciseLogSchema(Schema):
+    id = fields.Int(dump_only=True)
+    exercise_id = fields.Nested(PlainExerciseSchema)
+    date = fields.Date(required=True)
 
 
 class UserSchema(Schema):
