@@ -59,8 +59,10 @@ class VideoAndExerciseSchema(Schema):
 
 class ExerciseLogSchema(Schema):
     id = fields.Int(dump_only=True)
-    exercise_id = fields.Nested(PlainExerciseSchema)
     date = fields.Date(required=True)
+    exercises = fields.List(
+        fields.Nested(PlainExerciseSchema()), dump_only=True
+    )
 
 
 class UserSchema(Schema):

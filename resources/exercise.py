@@ -26,7 +26,7 @@ class exercise(MethodView):
         exercise = ExercisesModel.query.get_or_404(exercise_id)
         db.session.delete(exercise)
         db.session.commit()
-        return {"message": "exercise deletado"}
+        return {"message": "exercício deletado"}
 
     # @jwt_required()
     @blp.arguments(ExerciseUpdateSchema)
@@ -78,14 +78,16 @@ class exerciseList(MethodView):
         return exercise
 
 
-@blp.route("/exercise/log")
+@blp.route("/exercise/log/<int:exercise_id>")
 class exerciseLog(MethodView):
     # @jwt_required(fresh=True)
     @blp.arguments(ExerciseLogSchema)
     @blp.response(201, ExerciseLogSchema)
-    def post(self, log_data):
-        log = ExerciseLogs(**log_data)
-        # **exercise_data turns the dictionary received into keyword args
+    def post(self, log_data, exercise_id):
+        exercise = ExercisesModel.query.get_or_404(
+            exercise_id
+        )  # query method comes from db.model class from flask-sqlalchemy
+        log = ExerciseLogs(exercise_id=exercise_id, **log_data)
 
         try:
             db.session.add(log)
@@ -94,4 +96,4 @@ class exerciseLog(MethodView):
         except SQLAlchemyError:
             abort(500, message="Erro ao inserir log no banco")
 
-        return log
+        return {log, exercise}
