@@ -27,7 +27,7 @@ class PlainVideoSchema(Schema):
 
 class ExerciseUpdateSchema(Schema):
     name = fields.Str(required=False)
-    type = fields.Str(required=False)
+    type = fields.Str(required=False, nullable=True)
 
 
 class ExerciseSchema(PlainExerciseSchema):

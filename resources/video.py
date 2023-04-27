@@ -3,8 +3,8 @@ from flask.views import MethodView
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from db import db
-from schemas import VideoAndExerciseSchema, VideoSchema
-from models import VideoModel, ExerciseVideos, ExercisesModel
+from schemas import VideoAndExerciseSchema, VideoSchema, ExerciseSchema
+from models import VideoModel, ExercisesModel
 
 
 blp = Blueprint("Video", __name__, description="Operações em videos")
@@ -12,10 +12,12 @@ blp = Blueprint("Video", __name__, description="Operações em videos")
 
 @blp.route("/video/<int:exercise_id>")
 class GetVideoFromExercise(MethodView):
-    @blp.response(200, VideoAndExerciseSchema)
+    @blp.response(200, ExerciseSchema)
     def get(self, exercise_id):
-        videos = ExerciseVideos.query.all(exercise_id)
-        return videos
+        exercise = ExercisesModel.query.get(
+            exercise_id
+        )  # query method comes from db.model class from flask-sqlalchemy
+        return exercise
 
 
 @blp.route("/video/<int:video_id>")
