@@ -10,12 +10,13 @@ Uma API para criação e acompanhamento de treinos e exercício físico no geral
 
 1. Clone o projeto e certifique-se de estar na branch `main`
 2. Instalação sem Docker
-  2.1 Crie um ambiente virtual do Python (virtualenv) para instalação das dependências.
-  2.2 Com o ambiente virtual ativo, rode o comando na raiz do projeto: 
+2.1 Crie um ambiente virtual do Python (virtualenv) para instalação das dependências.
+
+2.2 Com o ambiente virtual ativo, rode o comando na raiz do projeto: 
 ```bash
   pip install requirements.txt
 ```
-  2.3 Após a instalação terminar, rode o projeto com o comando:
+2.3 Após a instalação terminar, rode o projeto com o comando:
 ```bash
   flask run --reload
 ```
