@@ -5,7 +5,12 @@ from flask.views import MethodView
 
 from db import db
 from sqlalchemy.exc import SQLAlchemyError
-from schemas import ExerciseSchema, ExerciseUpdateSchema, ExerciseLogSchema
+from schemas import (
+    ExerciseSchema,
+    PlainExerciseSchema,
+    ExerciseUpdateSchema,
+    ExerciseLogSchema,
+)
 from models import ExercisesModel, ExerciseLogs
 
 blp = Blueprint("Exercícios", __name__, description="Operações em exercícios")
@@ -15,10 +20,12 @@ blp = Blueprint("Exercícios", __name__, description="Operações em exercícios
 class exercise(MethodView):
     @blp.response(200, ExerciseSchema)
     def get(self, exercise_id):
+        """Encontra e retorna o exercício baseado no ID"""
         exercise = ExercisesModel.query.get_or_404(exercise_id)
         return exercise
 
     def delete(self, exercise_id):
+        """Exclui o exercício baseado no ID"""
         exercise = ExercisesModel.query.get_or_404(exercise_id)
         db.session.delete(exercise)
         db.session.commit()
@@ -27,6 +34,7 @@ class exercise(MethodView):
     @blp.arguments(ExerciseUpdateSchema)
     @blp.response(200, ExerciseUpdateSchema)
     def put(self, exercise_data, exercise_id):
+        """Muda o título dado ao exercício baseado no ID"""
         exercise = ExercisesModel.query.get(exercise_id)
 
         if exercise:
@@ -44,18 +52,20 @@ class exercise(MethodView):
 class exerciseList(MethodView):
     @blp.response(200, ExerciseSchema(many=True))
     def get(self):
+        """Retorna todos os exercícios já cadastrados"""
         return ExercisesModel.query.all()
 
-    @blp.arguments(ExerciseSchema)
-    @blp.response(201, ExerciseSchema)
+    @blp.arguments(PlainExerciseSchema)
+    @blp.response(201, PlainExerciseSchema)
     def post(self, exercise_data):
+        """Cria um novo exercício"""
         exercise = ExercisesModel(**exercise_data)
 
         try:
             db.session.add(exercise)
             db.session.commit()
         except SQLAlchemyError:
-            abort(500, message="Erro ao inserir exercise no banco")
+            abort(500, message="Erro ao inserir exercício no banco")
 
         return exercise
 
@@ -65,6 +75,7 @@ class exerciseLog(MethodView):
     @blp.arguments(ExerciseLogSchema)
     @blp.response(201, ExerciseLogSchema)
     def post(self, log_data, exercise_id):
+        """Cria um novo log do exercício baseado na data e ID do exercício"""
         exercise = ExercisesModel.query.get_or_404(exercise_id)
         if exercise:
             log = ExerciseLogs(exercise_id=exercise_id, **log_data)

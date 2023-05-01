@@ -13,6 +13,7 @@ blp = Blueprint("Video", __name__, description="Operações em videos")
 @blp.route("/video/<int:video_id>")
 class VideoDeletion(MethodView):
     def delete(self, video_id):
+        """Exclui o video baseado no ID"""
         video = VideoModel.query.get_or_404(video_id)
         db.session.delete(video)
         db.session.commit()
@@ -21,10 +22,10 @@ class VideoDeletion(MethodView):
 
 @blp.route("/video")
 class StoreList(MethodView):
-    # Cria um novo vídeo ou retorna seu id no banco se o yt_id já existe.
     @blp.arguments(VideoSchema)
     @blp.response(200, VideoSchema)
     def post(self, video_data):
+        """Cria um novo vídeo ou retorna o id no banco se o yt_id já existe."""
         print(video_data)
         video = VideoModel.query.filter(
             VideoModel.yt_id == video_data["yt_id"]
@@ -44,9 +45,9 @@ class StoreList(MethodView):
 
 @blp.route("/exercise/<exercise_id>/video/<video_id>")
 class LinkVideosToExercise(MethodView):
-    # Atribuir video ao exercício
     @blp.response(201, VideoAndExerciseSchema)
     def post(self, exercise_id, video_id):
+        """Atribui um video já criado ao exercício já criado"""
         exercise = ExercisesModel.query.get_or_404(exercise_id)
         video = VideoModel.query.get_or_404(video_id)
 
@@ -62,9 +63,9 @@ class LinkVideosToExercise(MethodView):
 
         return video
 
-    # Remover video do exercício
     @blp.response(200, VideoAndExerciseSchema)
     def delete(self, exercise_id, video_id):
+        """Remove o video do exercício"""
         exercise = ExercisesModel.query.get_or_404(exercise_id)
         video = VideoModel.query.get_or_404(video_id)
         exercise.videos.remove(video)
