@@ -9,23 +9,23 @@ Uma API para criação e acompanhamento de treinos e exercício físico no geral
 ## Instalação
 
 1. Clone o projeto e certifique-se de estar na branch `main`
-2. Crie um ambiente virtual do Python (virtualenv) para instalação das dependências.
-3. Com o ambiente virtual ativo, rode o comando na raiz do projeto: 
+2. Instalação sem Docker
+  2.1 Crie um ambiente virtual do Python (virtualenv) para instalação das dependências.
+  2.2 Com o ambiente virtual ativo, rode o comando na raiz do projeto: 
 ```bash
   pip install requirements.txt
 ```
-4. Após a instalação terminar, rode o projeto com o comando:
+  2.3 Após a instalação terminar, rode o projeto com o comando:
 ```bash
   flask run --reload
 ```
-OU se preferir rodar o projeto com o Docker, na raiz do projeto:
 
-Primeiro crie a imagem:
+3. Instalação com Docker
+  3.1 Na raiz do projeto, crie a imagem:
 ```bash
   docker build -t rest-apis-flask-python .
 ```
-
-Depois rode a imagem criada:
+  3.2 Rode a imagem criada:
 ```bash
   docker run -p 5000:5000 rest-apis-flask-python
 ```
