@@ -1,23 +1,13 @@
 from flask_smorest import abort, Blueprint
 from flask.views import MethodView
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
-from schemas import VideoAndExerciseSchema, VideoSchema, ExerciseSchema
+from schemas import VideoAndExerciseSchema, VideoSchema
 from models import VideoModel, ExercisesModel
 
 
 blp = Blueprint("Video", __name__, description="Operações em videos")
-
-
-@blp.route("/video/<int:exercise_id>")
-class GetVideoFromExercise(MethodView):
-    @blp.response(200, ExerciseSchema)
-    def get(self, exercise_id):
-        exercise = ExercisesModel.query.get(
-            exercise_id
-        )  # query method comes from db.model class from flask-sqlalchemy
-        return exercise
 
 
 @blp.route("/video/<int:video_id>")
@@ -31,31 +21,30 @@ class VideoDeletion(MethodView):
 
 @blp.route("/video")
 class StoreList(MethodView):
-    @blp.response(
-        200, VideoSchema(many=True)
-    )  # many=True turns the response into a list
-    def get(self):
-        return VideoModel.query.all()
-
+    # Cria um novo vídeo ou retorna seu id no banco se o yt_id já existe.
     @blp.arguments(VideoSchema)
     @blp.response(200, VideoSchema)
     def post(self, video_data):
-        video = VideoModel(**video_data)
+        print(video_data)
+        video = VideoModel.query.filter(
+            VideoModel.yt_id == video_data["yt_id"]
+        ).first()
+        if video is None:
+            video = VideoModel(**video_data)
+        else:
+            return video
         try:
             db.session.add(video)
             db.session.commit()
-        except IntegrityError:  # violates the constraint of unique name
-            abort(400, message="Já existe um video com esse nome")
         except SQLAlchemyError:
             abort(500, message="Ocorreu um erro ao salvar o video.")
 
         return video
 
 
-@blp.route(
-    "/exercise/<exercise_id>/video/<video_id>"
-)  # links videos + exercises
+@blp.route("/exercise/<exercise_id>/video/<video_id>")
 class LinkVideosToExercise(MethodView):
+    # Atribuir video ao exercício
     @blp.response(201, VideoAndExerciseSchema)
     def post(self, exercise_id, video_id):
         exercise = ExercisesModel.query.get_or_404(exercise_id)
@@ -73,8 +62,9 @@ class LinkVideosToExercise(MethodView):
 
         return video
 
+    # Remover video do exercício
     @blp.response(200, VideoAndExerciseSchema)
-    def delete(self, exercise_id, video_id):  # un-links videos + exercises
+    def delete(self, exercise_id, video_id):
         exercise = ExercisesModel.query.get_or_404(exercise_id)
         video = VideoModel.query.get_or_404(video_id)
         exercise.videos.remove(video)
