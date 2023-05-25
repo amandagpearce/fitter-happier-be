@@ -3,7 +3,7 @@ from flask.views import MethodView
 from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
-from schemas import VideoAndExerciseSchema, VideoSchema
+from schemas import VideoAndExerciseSchema, PlainVideoSchema
 from models import VideoModel, ExercisesModel
 
 
@@ -22,8 +22,8 @@ class VideoDeletion(MethodView):
 
 @blp.route("/video")
 class StoreList(MethodView):
-    @blp.arguments(VideoSchema)
-    @blp.response(200, VideoSchema)
+    @blp.arguments(PlainVideoSchema)
+    @blp.response(200, PlainVideoSchema)
     def post(self, video_data):
         """Cria um novo vídeo ou retorna o id no banco se o yt_id já existe."""
         print(video_data)
